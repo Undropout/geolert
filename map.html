@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mortifyingly Mazy Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* CSS stuff to make things look somewhat decent */
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #description {
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+      }
+
+      #infowindow-content .title {
+        font-weight: bold;
+      }
+
+      #infowindow-content {
+        display: none;
+      }
+
+      #map #infowindow-content {
+        display: inline;
+      }
+
+      .pac-card {
+        margin: 10px 10px 0 0;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        background-color: #fff;
+        font-family: Roboto;
+      }
+
+      #pac-container {
+        padding-bottom: 12px;
+        margin-right: 12px;
+      }
+
+      .pac-controls {
+        display: inline-block;
+        padding: 5px 11px;
+      }
+
+      .pac-controls label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 400px;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+      #title {
+        color: #fff;
+        background-color: #4d90fe;
+        font-size: 25px;
+        font-weight: 500;
+        padding: 6px 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pac-card" id="pac-card">
+      <div>
+
+        <div id="title">
+          Search for Location
+        </div>
+        <div id="type-selector" class="pac-controls">
+          <!-- Input to search for anything be it an adress or a company name or something similar-->
+          <input type="radio" name="type" id="changetype-all" checked="checked">
+          <label for="changetype-all">All</label>
+
+          <input type="radio" name="type" id="changetype-establishment">
+          <!-- Search for any establishments [Looking up a company name to find the nearest store] -->
+          <label for="changetype-establishment">Establishments</label>
+
+          <input type="radio" name="type" id="changetype-address">
+          <!-- Search for an address -->
+          <label for="changetype-address">Addresses</label>
+        </div>
+      </div>
+      <div id="pac-container">
+        <!-- Text box where you'd input a location -->
+        <input id="pac-input" type="text"
+            placeholder="Enter a location">
+      </div>
+    </div>
+    <div id="map"></div>
+    <!-- Information regarding the map (name and address) -->
+    <div id="infowindow-content">
+      <img src="" width="16" height="16" id="place-icon">
+      <span id="place-name"  class="title"></span><br>
+      <span id="place-address"></span>
+    </div>
+
+    <script>
+      // Initiate the map
+      function initMap() {
+
+        //Variable that holds the google map 
+        var map = new google.maps.Map(document.getElementById('map'), {
+          //This is where the map will show the user when the page loads
+          center: {
+            lat: 74.4057, lng: 40.0583},
+          //This is the speciic level of zoom. 
+          zoom: 13
+        });
+        //These are the variables that hold things relevant to the input
+        var card = document.getElementById('pac-card');
+        var input = document.getElementById('pac-input');
+        var types = document.getElementById('type-selector');
+
+        //This is where the information that is used at the top will be pushed to for the user to see. 
+        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(card);
+
+        //This is the autocomplete variable that holds... you guessed it the autcomplete that would be based on user's input. 
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
+        //Creating a bound for the autcomplete regarding the map. 
+        autocomplete.bindTo('bounds', map);
+
+        // The variable that holds the infowindow which is basically a popwindow above the map. 
+        var infowindow = new google.maps.InfoWindow();
+        var infowindowContent = document.getElementById('infowindow-content');
+        infowindow.setContent(infowindowContent);
+
+        //Marker variable that will hold the marker ability that Google Maps has. 
+        var marker = new google.maps.Marker({
+          //The marker will be based on the map. 
+          map: map,
+          //This is where the marker point will be at. 
+          anchorPoint: new google.maps.Point(0, -29)
+        });
+        //Function that will react when the location of where the map is focusing on changes. 
+        autocomplete.addListener('place_changed', function() {
+          //Closes the infowindow
+          infowindow.close();
+          //The marker that was plaed in the previous place is now not visible for the user. 
+          marker.setVisible(false);
+          // Variable that holds the autocomplete places. 
+          var place = autocomplete.getPlace();
+          //If there is no information on the input, there will be an error. 
+          if (!place.geometry) {
+            document.write("No details available for input: '" + place.name + "'");
+            return;
+          }
+
+          // If the place has a geometry, then present it on a map.
+          if (place.geometry.viewport) {
+            map.fitBounds(place.geometry.viewport);
+          } else {
+            map.setCenter(place.geometry.location);
+            map.setZoom(17);
+          }
+          //Setting the position of the new marker, and making it visible for the user to see. 
+          marker.setPosition(place.geometry.location);
+          marker.setVisible(true);
+
+          //This is the variable that holds the address; its currently blank as it will be utilized later. 
+          var address = '';
+          if (place.address_components) {
+            address = [
+              (place.address_components[0] && place.address_components[0].short_name || ''),
+              (place.address_components[1] && place.address_components[1].short_name || ''),
+              (place.address_components[2] && place.address_components[2].short_name || '')
+            ].join(' ');
+          }
+          //
+          infowindowContent.children['place-icon'].src = place.icon;
+          infowindowContent.children['place-name'].textContent = place.name;
+          infowindowContent.children['place-address'].textContent = address;
+          infowindow.open(map, marker);
+        });
+
+        // Sets a listener on a radio button to change the filter type on Places
+        // Autocomplete.
+        function setupClickListener(id, types) {
+          var radioButton = document.getElementById(id);
+          radioButton.addEventListener('click', function() {
+            autocomplete.setTypes(types);
+          });
+        }
+
+        setupClickListener('changetype-all', []);
+        setupClickListener('changetype-address', ['address']);
+        setupClickListener('changetype-establishment', ['establishment']);
+        setupClickListener('changetype-geocode', ['geocode']);
+
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx8019bevKZrg6BjcXRO9UiT_L6ansx2c&libraries=places&callback=initMap" async defer></script>
+  </body>
+</html>
