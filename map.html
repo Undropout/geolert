@@ -103,6 +103,10 @@
           <input type="radio" name="type" id="changetype-address">
           <!-- Search for an address -->
           <label for="changetype-address">Addresses</label>
+          
+          <input type="radio" name="type" id='changetype-address'>
+          <!-- Search for latitude and longitude -->
+          <label for="changetype-address">Latitude and Longitude</label>
         </div>
       </div>
       <div id="pac-container">
@@ -167,7 +171,7 @@
           var place = autocomplete.getPlace();
           //If there is no information on the input, there will be an error. 
           if (!place.geometry) {
-            document.write("No details available for input: '" + place.name + "'");
+            alert("No details available for input: '" + place.name + "'");
             return;
           }
 
@@ -210,7 +214,7 @@
         setupClickListener('changetype-all', []);
         setupClickListener('changetype-address', ['address']);
         setupClickListener('changetype-establishment', ['establishment']);
-        setupClickListener('changetype-geocode', ['geocode']);
+        setupClickListener('changetype-geocode', ['latitude','longitude']);
 
       }
     </script>
