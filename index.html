@@ -1,12 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link href="./assets/styles.css" rel="stylesheet" type="text/css" />
 </head>
+
 <body>
-    
+    <div class="content">
+        <section id="data-table">
+            <div class="container">
+                <div clas="row">
+                    <table class="table table-bordered table-striped">
+                        <caption class="text-center">
+                            <h1>User Name Database</h1>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th>User Name:</th>
+                                <th>User Type</th>
+                                <th>User Email</th>
+                                <th>Recipient Email</th>
+                                <th>Trigger Location</th>
+                                <th>Message Contents</th>
+                             
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="container">
+                <div class="row">
+                    <form>
+                        <div class="form-group">
+                            <label for="newUserName">User Name</label>
+                            <input type="text" class="form-control" id="newUserName" placeholder="Name"></input>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserType">User Type</label>
+                            <select class="form-control" id="newUserType" placeholder="Type">
+                                <option value="Scout">Scout</option>
+                                <option value="HQ">HQ</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserEmail">User email</label>
+                            <input type="text" class="form-control" id="newUserEmail" placeholder="Email"></input>
+                        </div>
+                        <div class="form-group">
+                            <label for="newRecipient">Recipient email</label>
+                            <input type="text" class="form-control" id="newRecipient" placeholder="Recipient"></input>
+                        </div>
+                        <div class="form-group">
+                            <label for="newTriggerLocation">Trigger Location</label>
+                            <input type="text" class="form-control" id="newTriggerLocation" placeholder="Trigger Location"></input>
+                        </div>
+                        <div class="form-group">
+                                <label for="newMessage">Message</label>
+                                <input type="text" class="form-control" id="newMessage" placeholder="Message"></input>
+                        </div>
+                        <button id="submitNewUser" type="submit" class="btn btn-danger flat-btn">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
+    <script src="./assets/config.js"></script>
+    <script src="./assets/main.js"></script>
 </body>
-</html>
