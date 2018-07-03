@@ -238,7 +238,7 @@
             marker.setVisible(true);
 
             //This is the variable that holds the address; its currently blank as it will be utilized later. 
-            var address = '';
+            address = '';
             if (place.address_components) {
               address = [
                 (place.address_components[0] && place.address_components[0].short_name || ''),
@@ -313,15 +313,26 @@
         }
 
         // I tried to make a feature that would save your data after inputting some data, and these variables would save those strings. 
-        $('#saveButton').on('click', function () {
+        var delay = 5000;
+        setTimeout(function () {
+          $('#saveButton').on('click', function () {
           var name = escape(document.getElementById('name').value);
-          console.log(name);
+          var replacedName = name.replace("%20", " "); // replacing %20 with spaces
+          console.log(replacedName);
           var address = escape(document.getElementById('address').value);
-          console.log(address);
+          var replaceAddress = address.replace("%20", " "); // replacing %20 with spaces
+          console.log(replaceAddress);
           // var type = document.getElementById('typeSelect'); //We need to fix this
           // console.log(type);
           var latlng = marker.getPosition();
           var url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
+          while (!lat()){
+            url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
+          } 
+
+          //Checking to see if this would give us our latitude and longitude. 
+          console.log(latlng.lat());
+          console.log(latlng.lng());
 
           //The downloadURL is vital as it responds to what happens when there is something in the textbox. THis is why I didn't simply comment out the entire savaData function. 
           downloadUrl(url, function (data, responseCode) {
@@ -332,6 +343,7 @@
             }
           });
         });
+        }, delay);
 
         // function saveData() {
         //   console.log(name);
