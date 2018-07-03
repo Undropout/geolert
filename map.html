@@ -203,8 +203,6 @@
           var input = document.getElementById('pac-input');
           var types = document.getElementById('type-selector');
 
-          // $('#address').innerHTML(input);
-
           //This is where the information that is used at the top will be pushed to for the user to see. 
           map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
 
@@ -266,7 +264,7 @@
 
         google.maps.event.addListener(map, 'click', function (event) {
           marker = new google.maps.Marker({
-            position: event.latLng,
+            position: event.latlng,
             map: map
           });
         });
@@ -331,13 +329,11 @@
             for (var i = 0; i < name.length; i++){
               name = name.replace('%20', ' ');
             }
-            for (var i = 0; i < name.length; i++){
-              name = name.replace(/%2C/g,",");
-            }
             console.log(name);
             var address = escape(document.getElementById('address').value);
             for (var i = 0; i < address.length; i++){
               address = address.replace('%20', ' ');
+              address = address.replace('%2C', ', ')
             }
             console.log(address);
             // var type = document.getElementById('typeSelect'); //We need to fix this
@@ -348,6 +344,9 @@
             //Checking to see if this would give us our latitude and longitude. 
             console.log(latlng.lat());
             console.log(latlng.lng());
+
+            var longitude = latlng.lat();
+            var latitude = latlng.lng();
 
             //The downloadURL is vital as it responds to what happens when there is something in the textbox. THis is why I didn't simply comment out the entire savaData function. 
             downloadUrl(url, function (data, responseCode) {
@@ -415,6 +414,10 @@
             callback(request.responseText, request.status);
           }
         };
+
+        $('#marker').on('click', function(){
+
+        });
 
         request.open('GET', url, true);
         // request.send(null);

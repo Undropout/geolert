@@ -16,5 +16,11 @@ Sites Used:
 
 - Saving names, and addresses into variables: 
     - https://developers.google.com/maps/documentation/javascript/info-windows-to-db
+- Changing %20s with spaces
+    - https://appendto.com/2016/02/replace-spaces-underscores-javascript/
+
+latlng.lat() - This will get the latitude of the location.
+latlng.lng() - This will get the longitude 
+
 
 
