@@ -167,7 +167,6 @@
         </tr>
       </table>
     </div>
-    <div id="message">Location Saved</div>
     <!-- Google Maps API with Key -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx8019bevKZrg6BjcXRO9UiT_L6ansx2c&libraries=places&callback=initMap"
       async defer></script>
@@ -316,33 +315,37 @@
         var delay = 5000;
         setTimeout(function () {
           $('#saveButton').on('click', function () {
-          var name = escape(document.getElementById('name').value);
-          var replacedName = name.replace("%20", " "); // replacing %20 with spaces
-          console.log(replacedName);
-          var address = escape(document.getElementById('address').value);
-          var replaceAddress = address.replace("%20", " "); // replacing %20 with spaces
-          console.log(replaceAddress);
-          // var type = document.getElementById('typeSelect'); //We need to fix this
-          // console.log(type);
-          var latlng = marker.getPosition();
-          var url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
-          while (!lat()){
-            url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
-          } 
-
-          //Checking to see if this would give us our latitude and longitude. 
-          console.log(latlng.lat());
-          console.log(latlng.lng());
-
-          //The downloadURL is vital as it responds to what happens when there is something in the textbox. THis is why I didn't simply comment out the entire savaData function. 
-          downloadUrl(url, function (data, responseCode) {
-
-            if (responseCode == 200 && data.length <= 1) {
-              infowindow.close();
-              messagewindow.open(map, marker);
+            var name = escape(document.getElementById('name').value);
+            for (var i = 0; i < name.length; i++){
+              name = name.replace('%20', ' ');
             }
+            console.log(name);
+            var address = escape(document.getElementById('address').value);
+            for (var i = 0; i < name.length; i++){
+              address = address.replace('%20', ' ');
+            }
+            console.log(address);
+            // var type = document.getElementById('typeSelect'); //We need to fix this
+            // console.log(type);
+            var latlng = marker.getPosition();
+            var url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
+            while (!lat()) {
+              url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
+            }
+
+            //Checking to see if this would give us our latitude and longitude. 
+            console.log(latlng.lat());
+            console.log(latlng.lng());
+
+            //The downloadURL is vital as it responds to what happens when there is something in the textbox. THis is why I didn't simply comment out the entire savaData function. 
+            downloadUrl(url, function (data, responseCode) {
+
+              if (responseCode == 200 && data.length <= 1) {
+                infowindow.close();
+                messagewindow.open(map, marker);
+              }
+            });
           });
-        });
         }, delay);
 
         // function saveData() {
