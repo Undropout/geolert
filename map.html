@@ -203,6 +203,8 @@
           var input = document.getElementById('pac-input');
           var types = document.getElementById('type-selector');
 
+          // $('#address').innerHTML(input);
+
           //This is where the information that is used at the top will be pushed to for the user to see. 
           map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
 
@@ -289,9 +291,22 @@
             };
 
             infowindow.setPosition(pos);
+            marker = new google.maps.Marker({
+              position: pos,
+              map: map
+            })
             infowindow.setContent(tableSave);
             infowindow.open(map);
             map.setCenter(pos);
+
+            // navigator.geolocation.getCurrentPosition(function(position){
+            //   map.setZoom(17);
+            //   marker = new google.maps.Marker({
+            //     position: pos,
+            //     map: map
+            //   })
+            // })
+
           }, function () {
             handleLocationError(true, infowindow, map.getCenter());
           });
@@ -302,9 +317,6 @@
 
         function handleLocationError(browserHasGeolocation, infowindow, pos) {
           infowindow.setPosition(pos);
-          infowindow.setContent(browserHasGeolocation ?
-            'Error: The Geolocation service failed.' :
-            'Error: Your browser doesnt support geolocation.');
           infowindow.open(map);
         }
         function lat() {
@@ -319,9 +331,12 @@
             for (var i = 0; i < name.length; i++){
               name = name.replace('%20', ' ');
             }
+            for (var i = 0; i < name.length; i++){
+              name = name.replace(/%2C/g,",");
+            }
             console.log(name);
             var address = escape(document.getElementById('address').value);
-            for (var i = 0; i < name.length; i++){
+            for (var i = 0; i < address.length; i++){
               address = address.replace('%20', ' ');
             }
             console.log(address);
@@ -329,9 +344,6 @@
             // console.log(type);
             var latlng = marker.getPosition();
             var url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
-            while (!lat()) {
-              url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
-            }
 
             //Checking to see if this would give us our latitude and longitude. 
             console.log(latlng.lat());
