@@ -93,6 +93,7 @@
 </head>
 
 <body>
+
   <div class="pac-card" id="pac-card">
     <div>
 
@@ -130,7 +131,7 @@
     <br>
     <span id="place-address"></span>
     <div id='form'>
-      <table id="tableSave"> 
+      <table id="tableSave">
         <tr>
           <td>Name</td>
           <td>
@@ -144,19 +145,24 @@
           </td>
         </tr>
         <tr>
-          <td>Type:</td>
+          <!-- <td>Type:</td>
           <td>
-            <select id="Scout"> +
+            <select id="typeSelect"> +
               <option value='scoutHome' SELECTED>Scout Home</option>
               <option value='currentLocation' SELECTED>Current Location</option>
 
             </select>
-          </td>
+          </td> -->
         </tr>
         <tr>
           <td></td>
           <td>
-            <input type="button" value="Save" onclick="saveData()">
+            <tr>
+              <td></td>
+              <td>
+                <button id="saveButton" type="button">Save</button>
+              </td>
+            </tr>
           </td>
         </tr>
       </table>
@@ -165,44 +171,91 @@
     <!-- Google Maps API with Key -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBx8019bevKZrg6BjcXRO9UiT_L6ansx2c&libraries=places&callback=initMap"
       async defer></script>
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
     <script>
       // Initiate the map function
-        var map;
-      
+      var map;
+      var geocoder;
+      var markers;
+      var infowindow;
+
       function initMap() {
 
         var initialLocation;
 
-        var geocoder = new google.maps.Geocoder;
+        geocoder = new google.maps.Geocoder;
 
-        var markers = [];
+        markers = [];
 
         //Variable that holds the google map 
-         map = new google.maps.Map(document.getElementById('map'), {
+        map = new google.maps.Map(document.getElementById('map'), {
           //This is where on the world map the page will load to 
-          center: {
-            lat: 74.4057, lng: 40.0583
-          },
+          center: { lat: 37.4419, lng: -122.1419 },
           //This is the speciic level of zoom. 
           zoom: 13
         });
 
-        //These are the variables that hold things relevant to the input
-        var card = document.getElementById('pac-card');
-        var input = document.getElementById('pac-input');
-        var types = document.getElementById('type-selector');
+        var delay = 5000
+        setTimeout(function () {
+          //These are the variables that hold things relevant to the input
+          var card = document.getElementById('pac-card');
+          var input = document.getElementById('pac-input');
+          var types = document.getElementById('type-selector');
 
-        //This is where the information that is used at the top will be pushed to for the user to see. 
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
+          //This is where the information that is used at the top will be pushed to for the user to see. 
+          map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
 
-        //This is the autocomplete variable that holds... you guessed it the autcomplete that would be based on user's input. 
-        var autocomplete = new google.maps.places.Autocomplete(input);
+          //This is the autocomplete variable that holds... you guessed it the autcomplete that would be based on user's input. 
+          var autocomplete = new google.maps.places.Autocomplete(input);
 
-        //Creating a bound for the autcomplete regarding the map. 
-        autocomplete.bindTo('bounds', map);
+          //Creating a bound for the autcomplete regarding the map. 
+          autocomplete.bindTo('bounds', map);
+
+          //Function that will react when the location of where the map is focusing on changes. 
+          autocomplete.addListener('place_changed', function () {
+            //Closes the infowindow
+            infowindow.close();
+            //The marker that was plaed in the previous place is now not visible for the user. 
+            marker.setVisible(false);
+            // Variable that holds the autocomplete places. 
+            var place = autocomplete.getPlace();
+            //If there is no information on the input, there will be an error. 
+            if (!place.geometry) {
+              return;
+            }
+
+            // If the place has a geometry, then present it on a map.
+            if (place.geometry.viewport) {
+              map.fitBounds(place.geometry.viewport);
+            } else {
+              map.setCenter(place.geometry.location);
+              map.setZoom(17);
+            }
+            //Setting the position of the new marker, and making it visible for the user to see. 
+            marker.setPosition(place.geometry.location);
+            marker.setVisible(true);
+
+            //This is the variable that holds the address; its currently blank as it will be utilized later. 
+            var address = '';
+            if (place.address_components) {
+              address = [
+                (place.address_components[0] && place.address_components[0].short_name || ''),
+                (place.address_components[1] && place.address_components[1].short_name || ''),
+                (place.address_components[2] && place.address_components[2].short_name || '')
+              ].join(' ');
+            }
+            //appending children with these properties such as source and text content
+            infowindowContent.children['place-icon'].src = place.icon;
+            infowindowContent.children['place-name'].textContent = place.name;
+            infowindowContent.children['place-address'].textContent = address;
+            infowindow.open(map, marker);
+          });
+        }, delay)
 
         // The variable that holds the infowindow which is basically a popwindow above the map. 
-        var infowindow = new google.maps.InfoWindow({
+        infowindow = new google.maps.InfoWindow({
           content: document.getElementById('form')
         });
 
@@ -249,21 +302,26 @@
         }
 
         function handleLocationError(browserHasGeolocation, infowindow, pos) {
-          infoWindow.setPosition(pos);
-          infoWindow.setContent(browserHasGeolocation ?
+          infowindow.setPosition(pos);
+          infowindow.setContent(browserHasGeolocation ?
             'Error: The Geolocation service failed.' :
             'Error: Your browser doesnt support geolocation.');
-          infoWindow.open(map);
+          infowindow.open(map);
+        }
+        function lat() {
+
         }
 
         // I tried to make a feature that would save your data after inputting some data, and these variables would save those strings. 
-        function saveData() {
+        $('#saveButton').on('click', function () {
           var name = escape(document.getElementById('name').value);
+          console.log(name);
           var address = escape(document.getElementById('address').value);
-          var type = document.getElementById('type').value;
+          console.log(address);
+          // var type = document.getElementById('typeSelect'); //We need to fix this
+          // console.log(type);
           var latlng = marker.getPosition();
-          var url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address +
-            '&type=' + type + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
+          var url = 'phpsqlinfo_addrow.php?name=' + name + '&address=' + address + '&lat=' + latlng.lat() + '&lng=' + latlng.lng();
 
           //The downloadURL is vital as it responds to what happens when there is something in the textbox. THis is why I didn't simply comment out the entire savaData function. 
           downloadUrl(url, function (data, responseCode) {
@@ -273,53 +331,20 @@
               messagewindow.open(map, marker);
             }
           });
-        }
+        });
+
+        // function saveData() {
+        //   console.log(name);
+        //   console.log("Hello World");
+
+        // }
 
         //Marker variable that will hold the marker ability that Google Maps has. 
-        var marker = new google.maps.Marker({
+        marker = new google.maps.Marker({
           //The marker will be based on the map. 
           map: map,
           //This is where the marker point will be at. 
           anchorPoint: new google.maps.Point(0, -29)
-        });
-        //Function that will react when the location of where the map is focusing on changes. 
-        autocomplete.addListener('place_changed', function () {
-          //Closes the infowindow
-          infowindow.close();
-          //The marker that was plaed in the previous place is now not visible for the user. 
-          marker.setVisible(false);
-          // Variable that holds the autocomplete places. 
-          var place = autocomplete.getPlace();
-          //If there is no information on the input, there will be an error. 
-          if (!place.geometry) {
-            return;
-          }
-
-          // If the place has a geometry, then present it on a map.
-          if (place.geometry.viewport) {
-            map.fitBounds(place.geometry.viewport);
-          } else {
-            map.setCenter(place.geometry.location);
-            map.setZoom(17);
-          }
-          //Setting the position of the new marker, and making it visible for the user to see. 
-          marker.setPosition(place.geometry.location);
-          marker.setVisible(true);
-
-          //This is the variable that holds the address; its currently blank as it will be utilized later. 
-          var address = '';
-          if (place.address_components) {
-            address = [
-              (place.address_components[0] && place.address_components[0].short_name || ''),
-              (place.address_components[1] && place.address_components[1].short_name || ''),
-              (place.address_components[2] && place.address_components[2].short_name || '')
-            ].join(' ');
-          }
-          //appending children with these properties such as source and text content
-          infowindowContent.children['place-icon'].src = place.icon;
-          infowindowContent.children['place-name'].textContent = place.name;
-          infowindowContent.children['place-address'].textContent = address;
-          infowindow.open(map, marker);
         });
 
         // Sets a listener on a button to change the filter type on Places
@@ -365,7 +390,7 @@
         };
 
         request.open('GET', url, true);
-        request.send(null);
+        // request.send(null);
       }
 
       //This function is self-explanatory... 
@@ -378,7 +403,7 @@
           position: location,
           map: map
         });
-          
+
       }
       function geocodeLatLng(geocoder, map, infowindow) {
         var input = document.getElementById('latlng').value;
@@ -388,11 +413,11 @@
           if (status === 'OK') {
             if (results[0]) {
               map.setZoom(17);
-              var marker = new google.maps.Marker({
+              marker = new google.maps.Marker({
                 position: latlng,
                 map: map
               });
-              
+
               infowindow.setContent(results[0].formatted_address);
               infowindow.open(map, marker);
             } else {
@@ -406,4 +431,5 @@
     </script>
 
 </body>
+
 </html>
