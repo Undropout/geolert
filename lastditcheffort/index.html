@@ -7,42 +7,20 @@
     <title>Document</title>
 </head>
 <body>
-    <!DOCTYPE html>
-<html>
-<body>
-
-<p>Click the button to get your coordinates.</p>
-
-<button onclick="getLocation()">This button also does the thing</button>
-
-<p id="demo"></p>
-
 <script>
-  //  document.addEventListener("DOMContentLoaded", function() {
-    
-    window.setInterval(getLocation, 3000);
- //   });
-  
-
-var x = document.getElementById("demo");
-var d = new Date();
-function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
-        x.innerHTML = "Geolocation is not supported by this browser.";
-    }
-}
-
-function showPosition(position) {
-    x.innerHTML = "Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude + "<br>This has been updated at " + d;
-
-}
-
-    
-</script>
-
+        var x = document.getElementById("demo");
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(showPosition);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+        function showPosition(position) {
+            x.innerHTML = "Latitude: " + position.coords.latitude +
+            "<br>Longitude: " + position.coords.longitude;
+        }
+</script> 
 </body>
 </html>
 
